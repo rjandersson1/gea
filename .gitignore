@@ -11,3 +11,4 @@ data/logs/
 data/screenshots/raw/
 .vscode/
 .idea/
+.DS_Store

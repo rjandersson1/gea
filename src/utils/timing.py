@@ -32,11 +32,10 @@ class RateLimiter:
         pass
 
     def sleep(self) -> None:
-        """Call at end of each loop iteration. Blocks until next cycle."""
-        if self.next_time > time.time():
-            time.sleep(self.next_time - time.time())
+        now = time.time()
+        if self.next_time > now:
+            time.sleep(self.next_time - now)
         self.next_time += self.period
-        pass
 
 
 class LoopProfiler:

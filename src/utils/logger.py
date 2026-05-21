@@ -29,7 +29,9 @@ class CSVLogger:
         """
         self.path = path
         self.fields = fields
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+        dirpath = os.path.dirname(path)
+        if dirpath:
+            os.makedirs(dirpath, exist_ok=True)
         self.file = open(path, 'w', newline='')
         self.writer = csv.DictWriter(self.file, fieldnames=fields)
         self.writer.writeheader()

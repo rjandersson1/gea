@@ -25,10 +25,17 @@ class RateLimiter:
         Args:
             hz: target loop frequency
         """
+
+        self.hz = hz
+        self.period = 1.0 / hz
+        self.next_time = time.time() + self.period
         pass
 
     def sleep(self) -> None:
         """Call at end of each loop iteration. Blocks until next cycle."""
+        if self.next_time > time.time():
+            time.sleep(self.next_time - time.time())
+        self.next_time += self.period
         pass
 
 
@@ -36,12 +43,26 @@ class LoopProfiler:
     """Record loop durations and report statistics."""
 
     def __init__(self):
-        pass
+        self.durations = []
 
     def tick(self) -> None:
         """Call once per loop iteration."""
+        self.durations.append(time.time())
         pass
 
     def report(self) -> dict:
         """Return dict with keys: mean_ms, p95_ms, max_ms, n_samples."""
-        pass
+        if not self.durations:
+            return {'mean_ms': 0, 'p95_ms': 0, 'max_ms': 0, 'n_samples': 0}
+        # Calculate durations (in seconds)
+        if len(self.durations) < 2:
+            return {'mean_ms': 0, 'p95_ms': 0, 'max_ms': 0, 'n_samples': len(self.durations)}
+        durations = np.diff(self.durations)
+        # Convert to milliseconds
+        durations *= 1000
+        return {
+            'mean_ms': np.mean(durations),
+            'p95_ms': np.percentile(durations, 95),
+            'max_ms': np.max(durations),
+            'n_samples': len(durations)
+        }

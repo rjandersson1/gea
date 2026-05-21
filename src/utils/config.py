@@ -19,9 +19,14 @@ import os
 
 def load_config(path: str) -> dict:
     """Load a yaml config file. path can be absolute or relative to project root."""
-    pass
+    if not os.path.isabs(path):
+        path = os.path.join(get_project_root(), path)
+    
+    with open(path, 'r') as f:
+        return yaml.safe_load(f)
 
 
 def get_project_root() -> str:
     """Return absolute path to project root (one level above src/)."""
-    pass
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.dirname(os.path.dirname(current_dir))

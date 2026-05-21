@@ -1,1 +1,13 @@
-src/observation/__pycache__/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+.DS_Store
+**/.DS_Store
+venv/
+.env/
+env/
+data/logs/
+data/screenshots/raw/
+.vscode/
+.idea/

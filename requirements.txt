@@ -1,0 +1,31 @@
+# Phase 1 — Observation Pipeline
+
+# screenshot capture
+mss
+
+# image processing
+opencv-python
+numpy
+scipy
+Pillow
+
+# OCR
+pytesseract       # also requires tesseract binary: brew install tesseract (mac)
+                  #                                 apt install tesseract-ocr (linux)
+
+# config
+pyyaml
+
+# visualisation
+matplotlib
+pandas
+
+# testing
+pytest
+
+# Phase 2+ (not needed yet)
+# cvxpy
+# osqp
+# rasterio
+# fastapi
+# uvicorn

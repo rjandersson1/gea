@@ -1,0 +1,27 @@
+# OCR and color isolation parameters
+# Tune using notebooks/02_ocr_benchmark.ipynb
+
+color_isolator:
+  target_rgb: [0, 252, 0]
+  margin: 40
+  dilation_radius: 2
+
+preprocessing:
+  upscale_factor: 2
+  threshold_method: otsu      # otsu | adaptive | fixed
+  threshold_value: 127        # used only if method: fixed
+
+tesseract:
+  psm: 7                      # single text line
+  oem: 3                      # default LSTM engine
+
+fields:
+  heading:
+    whitelist: '0123456789NSEW '
+    outlier_threshold: 180.0
+  airspeed:
+    whitelist: '0123456789'
+    outlier_threshold: 200.0
+  altitude:
+    whitelist: '0123456789'
+    outlier_threshold: 5000.0

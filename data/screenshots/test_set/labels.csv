@@ -1,0 +1,4 @@
+filename,field,ground_truth
+# example row:
+# heading_270.png,heading,270
+# airspeed_150.png,airspeed,150

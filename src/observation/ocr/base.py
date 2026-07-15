@@ -85,8 +85,12 @@ class BaseOCR:
 
         level = RIL.WORD
         while True:
-            text = (ri.GetUTF8Text(level) or '').strip()
-            conf = ri.Confidence(level)
+            try:
+                text = (ri.GetUTF8Text(level) or '').strip()
+                conf = ri.Confidence(level)
+            except RuntimeError:
+                text = ''
+                conf = -1
             if text and conf >= 0:
                 bbox = ri.BoundingBox(level)
                 if bbox is not None:

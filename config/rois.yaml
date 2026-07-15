@@ -1,33 +1,25 @@
-# ROI pixel coordinates for all HUD elements
-# Set these using scripts/calibrate_rois.py with GE running
-# Format: x1, y1 = top-left corner; x2, y2 = bottom-right corner
-
-heading_tape:
-  x1: 0
-  y1: 0
-  x2: 0
-  y2: 0
-
 airspeed_tape:
-  x1: 0
-  y1: 0
-  x2: 0
-  y2: 0
-
+  x1: 8
+  x2: 145
+  y1: 243
+  y2: 445
 altitude_tape:
-  x1: 0
-  y1: 0
-  x2: 0
-  y2: 0
-
+  x1: 584
+  x2: 707
+  y1: 219
+  y2: 445
 attitude_indicator:
-  x1: 0
-  y1: 0
-  x2: 0
-  y2: 0
-
+  x1: 191
+  x2: 491
+  y1: 296
+  y2: 605
+heading_tape:
+  x1: 196
+  x2: 486
+  y1: 206
+  y2: 257
 status_bar:
   x1: 0
-  y1: 0
-  x2: 0
-  y2: 0
+  x2: 735
+  y1: 886
+  y2: 918

@@ -4,7 +4,11 @@ src/observation/ocr/base.py
 Responsibilities:
   - Shared OCR extraction for tape-style ROIs (heading, airspeed, altitude)
   - Preprocess crop via HUD-green color isolation
-  - Extract all tesseract tokens with bounding boxes
+  - Uses tesserocr (in-process Tesseract API binding) instead of pytesseract
+    to avoid per-call subprocess spawn overhead
+  - Keeps one PyTessBaseAPI instance alive per parser instance, reused
+    across all parse() calls
+  - Extract all tesseract word tokens with bounding boxes
   - Select the token nearest the ROI's centre axis (orientation-dependent)
   - Convert token to float, reject on outlier_threshold
 
@@ -18,13 +22,15 @@ Subclass contract:
 Dependencies:
   - numpy
   - opencv-python
-  - pytesseract
+  - tesserocr
+  - Pillow
   - src/observation/color_isolate.py
 """
 
 import re
 import numpy as np
-import pytesseract
+from PIL import Image
+from tesserocr import PyTessBaseAPI, PSM, RIL
 
 from src.observation.color_isolate import ColorIsolator
 
@@ -34,10 +40,18 @@ class BaseOCR:
     whitelist = '0123456789'
     outlier_threshold = float('inf')
     orientation = 'vertical'
-    psm = 11
+    psm = PSM.SPARSE_TEXT
 
     def __init__(self, isolator: ColorIsolator = None):
         self.isolator = isolator or ColorIsolator()
+        self._api = PyTessBaseAPI(path='/opt/homebrew/share/tessdata', psm=self.psm)
+        self._api.SetVariable('tessedit_char_whitelist', self.whitelist)
+
+    def __del__(self):
+        try:
+            self._api.End()
+        except Exception:
+            pass
 
     def parse(self, img: np.ndarray) -> float | None:
         token = self._extract_centre_token(img)
@@ -55,30 +69,35 @@ class BaseOCR:
 
     def _extract_centre_token(self, img: np.ndarray) -> str | None:
         mask = self._preprocess(img)
-        config = f"--psm {self.psm} -c tessedit_char_whitelist={self.whitelist}"
-        data = pytesseract.image_to_data(mask, config=config, output_type=pytesseract.Output.DICT)
+        pil_img = Image.fromarray(mask)
+
+        self._api.SetImage(pil_img)
+        self._api.Recognize()
 
         h, w = mask.shape[:2]
         mid = h / 2 if self.orientation == 'vertical' else w / 2
 
         best_token, best_dist = None, float('inf')
-        for i in range(len(data['text'])):
-            text = data['text'][i].strip()
-            if not text:
-                continue
-            try:
-                conf = int(float(data['conf'][i]))
-            except (ValueError, TypeError):
-                conf = -1
-            if conf < 0:
-                continue
 
-            x, y, tw, th = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
-            center = (y + th / 2) if self.orientation == 'vertical' else (x + tw / 2)
-            dist = abs(center - mid)
-            if dist < best_dist:
-                best_dist = dist
-                best_token = text
+        ri = self._api.GetIterator()
+        if ri is None:
+            return None
+
+        level = RIL.WORD
+        while True:
+            text = (ri.GetUTF8Text(level) or '').strip()
+            conf = ri.Confidence(level)
+            if text and conf >= 0:
+                bbox = ri.BoundingBox(level)
+                if bbox is not None:
+                    x1, y1, x2, y2 = bbox
+                    center = (y1 + y2) / 2 if self.orientation == 'vertical' else (x1 + x2) / 2
+                    dist = abs(center - mid)
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_token = text
+            if not ri.Next(level):
+                break
 
         return best_token
 

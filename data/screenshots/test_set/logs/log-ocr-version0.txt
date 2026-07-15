@@ -1,0 +1,42 @@
+frame_001.png
+  heading_tape: 30.0  (186.6 ms)  truth=30.0  err=+0.0
+  airspeed_tape: 620.0  (128.5 ms)  truth=620.0  err=+0.0
+  altitude_tape: 10700.0  (126.2 ms)  truth=10700.0  err=+0.0
+
+frame_002.png
+  heading_tape: 30.0  (127.4 ms)  truth=30.0  err=+0.0
+  airspeed_tape: 0.0  (124.7 ms)  truth=580.0  err=-580.0
+  altitude_tape: 11200.0  (125.2 ms)  truth=11200.0  err=+0.0
+
+frame_003.png
+  heading_tape: 33.0  (119.2 ms)  truth=33.0  err=+0.0
+  airspeed_tape: 630.0  (129.9 ms)  truth=630.0  err=+0.0
+  altitude_tape: 9100.0  (130.1 ms)  truth=9100.0  err=+0.0
+
+frame_004.png
+  heading_tape: 90.0  (121.2 ms)  truth=0.0  err=+90.0
+  airspeed_tape: 640.0  (126.7 ms)  truth=640.0  err=+0.0
+  altitude_tape: 5800.0  (127.4 ms)  truth=5700.0  err=+100.0
+
+frame_005.png
+  heading_tape: 90.0  (126.8 ms)  truth=12.0  err=+78.0
+  airspeed_tape: 590.0  (125.8 ms)  truth=590.0  err=+0.0
+  altitude_tape: 7700.0  (127.0 ms)  truth=7700.0  err=+0.0
+
+frame_006.png
+  heading_tape: 90.0  (128.6 ms)  truth=12.0  err=+78.0
+  airspeed_tape: None  (129.9 ms)  truth=600.0  MISS
+  altitude_tape: 7900.0  (128.7 ms)  truth=7900.0  err=+0.0
+
+--- latency summary (ms) ---
+  heading_tape: mean=135.0  p95=172.1  max=186.6  n=6
+  airspeed_tape: mean=127.6  p95=129.9  max=129.9  n=6
+  altitude_tape: mean=127.4  p95=129.7  max=130.1  n=6
+
+  sum of per-field means: 390.0 ms/frame
+  implied max sequential rate: 2.6 Hz
+
+--- accuracy summary ---
+  heading_tape: MAE=41.0  n=6  dropouts=0
+  airspeed_tape: MAE=116.0  n=5  dropouts=1
+  altitude_tape: MAE=16.7  n=6  dropouts=0

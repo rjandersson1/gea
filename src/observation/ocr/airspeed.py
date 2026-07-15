@@ -1,5 +1,5 @@
 """
-observation/ocr/airspeed.py
+src/observation/ocr/airspeed.py
 
 Responsibilities:
   - Parse current airspeed from the airspeed tape ROI (left side of HUD)
@@ -18,12 +18,4 @@ class AirspeedParser(BaseOCR):
 
     whitelist = '0123456789'
     outlier_threshold = 900.0
-
-    def parse(self, img) -> float | None:
-        """
-        Extract centre airspeed value from tape.
-
-        Returns:
-            Airspeed in knots, or None on failure
-        """
-        pass
+    orientation = 'vertical'

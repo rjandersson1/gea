@@ -1,5 +1,5 @@
 """
-observation/ocr/heading.py
+src/observation/ocr/heading.py
 
 Responsibilities:
   - Parse current heading from the heading tape ROI
@@ -18,16 +18,21 @@ class HeadingParser(BaseOCR):
 
     whitelist = '0123456789NSEW '
     outlier_threshold = 360.0
+    orientation = 'horizontal'
+
+    CARDINAL_DEGREES = {'N': 0.0, 'E': 90.0, 'S': 180.0, 'W': 270.0}
 
     def parse(self, img) -> float | None:
-        """
-        Extract centre heading value from tape.
+        value = super().parse(img)
+        if value is None:
+            return None
+        return value % 360.0
 
-        Returns:
-            Heading in degrees [0, 360), or None on failure
-        """
-        pass
+    def _token_to_value(self, token: str) -> float | None:
+        cardinal = self._cardinal_to_degrees(token)
+        if cardinal is not None:
+            return cardinal
+        return super()._token_to_value(token)
 
     def _cardinal_to_degrees(self, token: str) -> float | None:
-        """Convert N/S/E/W string to degrees. Returns None if not cardinal."""
-        pass
+        return self.CARDINAL_DEGREES.get(token.strip().upper())

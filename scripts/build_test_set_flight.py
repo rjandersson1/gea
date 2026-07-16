@@ -35,9 +35,9 @@ from src.utils.timing import RateLimiter
 from scripts.calibrate_rois import find_window, screenshot_window
 
 
-CAPTURE_HZ = 10.0
-CAPTURE_DURATION_S = 10.0
-PRE_CAPTURE_DELAY_S = 3.0
+CAPTURE_HZ = 2.0
+CAPTURE_DURATION_S = 500.0
+PRE_CAPTURE_DELAY_S = 5.0
 
 
 def _read_key() -> str:

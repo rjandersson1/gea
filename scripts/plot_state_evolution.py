@@ -53,7 +53,7 @@ def crop_image(img, roi: dict):
 
 def main():
     root = get_project_root()
-    folder_name = sys.argv[1] if len(sys.argv) > 1 else 'test_set'
+    folder_name = sys.argv[1] if len(sys.argv) > 1 else 'test_flight_10s'
     frames_dir = os.path.join(root, 'data', 'screenshots', folder_name)
     rois_path = os.path.join(root, 'config', 'rois.yaml')
 

@@ -3,7 +3,7 @@ scripts/plot_state_evolution.py
 
 Responsibilities:
   - Run OCR over an ordered sequence of frames (e.g. data/screenshots/test_flight_10s/)
-  - Assemble heading/airspeed/altitude time series (None -> NaN, gaps visible)
+  - Assemble heading/airspeed/altitude/roll/pitch time series (None -> NaN, gaps visible)
   - Plot one figure, one subplot per field, x-axis in seconds from capture start
   - Save figure to data/screenshots/state_evolution.png
 
@@ -21,6 +21,7 @@ Dependencies:
   - src/observation/ocr/heading.py
   - src/observation/ocr/airspeed.py
   - src/observation/ocr/altitude.py
+  - src/observation/ocr/attitude.py
 """
 
 import os
@@ -36,18 +37,31 @@ from src.utils.config import get_project_root
 from src.observation.ocr.heading import HeadingParser
 from src.observation.ocr.airspeed import AirspeedParser
 from src.observation.ocr.altitude import AltitudeParser
+from src.observation.ocr.attitude import AttitudeParser
 
 
 PARSERS = {
     'heading_tape': HeadingParser(),
     'airspeed_tape': AirspeedParser(),
     'altitude_tape': AltitudeParser(),
+    'attitude_indicator': AttitudeParser(),
+}
+
+# roi_name -> {series_name: attr on the parser's return object}
+# heading/airspeed/altitude each yield one OCRReading.value; attitude
+# yields one AttitudeReading with both roll and pitch, from one parse
+# call, so the two series don't cost a second OCR pass.
+FIELD_MAP = {
+    'heading_tape':       {'heading': 'value'},
+    'airspeed_tape':      {'airspeed': 'value'},
+    'altitude_tape':      {'altitude': 'value'},
+    'attitude_indicator': {'roll': 'roll', 'pitch': 'pitch'},
 }
 
 CAPTURE_HZ = 2
 # DATASET = 'test_flight_heading_360'  # default folder name, relative to data/screenshots/
 # DATASET = 'test_flight_10s'
-DATASET = 'test_flight_roll_pitch'
+DATASET = 'test_flight_roll-easy'
 
 def crop_image(img, roi: dict):
     return img[roi['y1']:roi['y2'], roi['x1']:roi['x2']]
@@ -67,23 +81,28 @@ def main():
         print(f"no frames found in {frames_dir}")
         return
 
-    series = {name: [] for name in PARSERS}
+    series_names = [name for fields in FIELD_MAP.values() for name in fields]
+    series = {name: [] for name in series_names}
 
     for frame_name in frames:
         img = cv2.imread(os.path.join(frames_dir, frame_name))
         for roi_name, parser in PARSERS.items():
+            field_map = FIELD_MAP[roi_name]
             if roi_name not in rois:
-                series[roi_name].append(np.nan)
+                for series_name in field_map:
+                    series[series_name].append(np.nan)
                 continue
             crop = crop_image(img, rois[roi_name])
-            value = parser.parse(crop).value
-            series[roi_name].append(value if value is not None else np.nan)
+            reading = parser.parse(crop)
+            for series_name, attr in field_map.items():
+                value = getattr(reading, attr)
+                series[series_name].append(value if value is not None else np.nan)
 
     n = len(frames)
     t = np.arange(n) / CAPTURE_HZ
 
-    fig, axes = plt.subplots(len(PARSERS), 1, figsize=(10, 8), sharex=True)
-    if len(PARSERS) == 1:
+    fig, axes = plt.subplots(len(series), 1, figsize=(10, 10), sharex=True)
+    if len(series) == 1:
         axes = [axes]
 
     for ax, (name, values) in zip(axes, series.items()):

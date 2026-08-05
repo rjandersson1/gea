@@ -103,22 +103,18 @@ class BaseOCR:
     def _preprocess(self, img: np.ndarray) -> np.ndarray:
         return self.isolator.isolate(img)
 
-    def _extract_centre_token(self, mask: np.ndarray) -> tuple | None:
+    def _extract_tokens(self, mask: np.ndarray, level=RIL.WORD) -> list:
+        """Return [(text, bbox, conf), ...] for all recognised tokens."""
         pil_img = Image.fromarray(mask)
 
         self._api.SetImage(pil_img)
         self._api.Recognize()
 
-        h, w = mask.shape[:2]
-        mid = h / 2 if self.orientation == 'vertical' else w / 2
-
-        best_token, best_bbox, best_dist = None, None, float('inf')
-
+        tokens = []
         ri = self._api.GetIterator()
         if ri is None:
-            return None
+            return tokens
 
-        level = RIL.WORD
         while True:
             try:
                 text = (ri.GetUTF8Text(level) or '').strip()
@@ -129,15 +125,29 @@ class BaseOCR:
             if text and conf >= 0:
                 bbox = ri.BoundingBox(level)
                 if bbox is not None:
-                    x1, y1, x2, y2 = bbox
-                    center = (y1 + y2) / 2 if self.orientation == 'vertical' else (x1 + x2) / 2
-                    dist = abs(center - mid)
-                    if dist < best_dist:
-                        best_dist = dist
-                        best_token = text
-                        best_bbox = bbox
+                    tokens.append((text, bbox, conf))
             if not ri.Next(level):
                 break
+
+        return tokens
+
+    def _extract_centre_token(self, mask: np.ndarray) -> tuple | None:
+        tokens = self._extract_tokens(mask)
+        if not tokens:
+            return None
+
+        h, w = mask.shape[:2]
+        mid = h / 2 if self.orientation == 'vertical' else w / 2
+
+        best_token, best_bbox, best_dist = None, None, float('inf')
+        for text, bbox, _conf in tokens:
+            x1, y1, x2, y2 = bbox
+            center = (y1 + y2) / 2 if self.orientation == 'vertical' else (x1 + x2) / 2
+            dist = abs(center - mid)
+            if dist < best_dist:
+                best_dist = dist
+                best_token = text
+                best_bbox = bbox
 
         if best_token is None:
             return None

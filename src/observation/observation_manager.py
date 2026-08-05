@@ -4,7 +4,7 @@ observation/observation_manager.py
 Responsibilities:
   - Single entry point for all observation data
   - Initialises and owns: ScreenCapture, ColorIsolator, all OCR parsers,
-    AttitudeEstimator, KMLPoller, CSVLogger
+    AttitudeParser, KMLPoller, CSVLogger
   - step() runs one full observation cycle and returns z_k dict
   - Timestamps every field at time of acquisition
   - Tracks source of each field (KML vs OCR vs CV) in z_k['source']
@@ -37,7 +37,7 @@ Dependencies:
   - src/observation/ocr/airspeed.py
   - src/observation/ocr/altitude.py
   - src/observation/ocr/status_bar.py
-  - src/observation/cv/attitude.py
+  - src/observation/ocr/attitude.py
   - src/observation/kml_poller.py
   - src/utils/config.py
   - src/utils/logger.py
@@ -49,7 +49,7 @@ from src.observation.ocr.heading import HeadingParser
 from src.observation.ocr.airspeed import AirspeedParser
 from src.observation.ocr.altitude import AltitudeParser
 from src.observation.ocr.status_bar import StatusBarParser
-from src.observation.cv.attitude import AttitudeEstimator
+from src.observation.ocr.attitude import AttitudeParser
 from src.observation.kml_poller import KMLPoller
 from src.utils.config import load_config
 from src.utils.logger import CSVLogger
@@ -87,7 +87,7 @@ class ObservationManager:
           1. grab full screenshot
           2. crop each ROI
           3. run OCR parsers on HUD ROIs
-          4. run AttitudeEstimator on attitude ROI
+          4. run AttitudeParser on attitude ROI
           5. run StatusBarParser on status bar ROI
           6. get latest KML fix
           7. assemble z_k dict with timestamps and sources

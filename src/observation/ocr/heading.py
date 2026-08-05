@@ -15,12 +15,12 @@ from src.observation.ocr.base import BaseOCR
 
 
 class HeadingParser(BaseOCR):
-
     whitelist = '0123456789NSEW '
     outlier_threshold = 360.0
     orientation = 'horizontal'
 
     CARDINAL_DEGREES = {'N': 0.0, 'E': 90.0, 'S': 180.0, 'W': 270.0}
+    VALID_CODES = {'3', '6', '12', '15', '21', '24', '30', '33'}
 
     def parse(self, img) -> float | None:
         value = super().parse(img)
@@ -32,7 +32,10 @@ class HeadingParser(BaseOCR):
         cardinal = self._cardinal_to_degrees(token)
         if cardinal is not None:
             return cardinal
-        return super()._token_to_value(token)
+        cleaned = token.strip()
+        if cleaned in self.VALID_CODES:
+            return float(cleaned) * 10.0
+        return None
 
     def _cardinal_to_degrees(self, token: str) -> float | None:
         return self.CARDINAL_DEGREES.get(token.strip().upper())

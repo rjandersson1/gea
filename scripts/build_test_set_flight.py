@@ -36,7 +36,7 @@ from scripts.calibrate_rois import find_window, screenshot_window
 
 
 CAPTURE_HZ = 2.0
-CAPTURE_DURATION_S = 500.0
+CAPTURE_DURATION_S = 120.0
 PRE_CAPTURE_DELAY_S = 5.0
 
 
@@ -84,7 +84,7 @@ def main():
     print(f"window locked: {bounds}")
 
     root = get_project_root()
-    out_dir = os.path.join(root, 'data', 'screenshots', 'test_flight_10s')
+    out_dir = os.path.join(root, 'data', 'screenshots', 'test_flight_heading_360')
     os.makedirs(out_dir, exist_ok=True)
 
     print("press 'p' to start a 10s capture burst (3s delay first), 'o' to stop")

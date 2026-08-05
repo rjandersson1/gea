@@ -44,7 +44,8 @@ PARSERS = {
     'altitude_tape': AltitudeParser(),
 }
 
-CAPTURE_HZ = 10.0
+CAPTURE_HZ = 2
+DATASET = 'test_flight_heading_360'  # default folder name, relative to data/screenshots/
 
 
 def crop_image(img, roi: dict):
@@ -53,7 +54,7 @@ def crop_image(img, roi: dict):
 
 def main():
     root = get_project_root()
-    folder_name = sys.argv[1] if len(sys.argv) > 1 else 'test_flight_10s'
+    folder_name = sys.argv[1] if len(sys.argv) > 1 else DATASET
     frames_dir = os.path.join(root, 'data', 'screenshots', folder_name)
     rois_path = os.path.join(root, 'config', 'rois.yaml')
 

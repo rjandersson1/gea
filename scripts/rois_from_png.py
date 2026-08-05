@@ -35,8 +35,8 @@ ROI_COLORS_BGR = {
     'heading_tape':       (255, 255, 0),    # cyan
     'airspeed_tape':      (0, 0, 255),      # red
     'altitude_tape':      (0, 255, 0),      # green
-    'attitude_indicator': (0, 255, 255),    # yellow
-    'status_bar':         (255, 0, 255),    # magenta
+    'status_bar':         (0, 255, 255),    # yellow
+    'attitude_indicator': (255, 0, 255),    # magenta
 }
 
 COLOR_TOLERANCE = 20

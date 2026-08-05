@@ -9,17 +9,17 @@ altitude_tape:
   y1: 303
   y2: 385
 attitude_indicator:
-  x1: 0
-  x2: 735
-  y1: 894
-  y2: 918
+  x1: 281
+  x2: 456
+  y1: 391
+  y2: 566
 heading_tape:
   x1: 254
   x2: 482
   y1: 233
   y2: 249
 status_bar:
-  x1: 281
-  x2: 456
-  y1: 391
-  y2: 566
+  x1: 0
+  x2: 735
+  y1: 894
+  y2: 918

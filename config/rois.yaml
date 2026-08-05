@@ -5,19 +5,19 @@ airspeed_tape:
   y2: 375
 altitude_tape:
   x1: 641
-  x2: 705
-  y1: 304
-  y2: 386
+  x2: 706
+  y1: 303
+  y2: 385
 attitude_indicator:
   x1: 0
   x2: 735
   y1: 894
   y2: 918
 heading_tape:
-  x1: 314
-  x2: 421
-  y1: 234
-  y2: 250
+  x1: 254
+  x2: 482
+  y1: 233
+  y2: 249
 status_bar:
   x1: 281
   x2: 456

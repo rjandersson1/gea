@@ -19,3 +19,6 @@ class AirspeedParser(BaseOCR):
     whitelist = '0123456789'
     outlier_threshold = 900.0
     orientation = 'vertical'
+
+    pixels_per_unit = 4.592
+    label_spacing_units = 10.0

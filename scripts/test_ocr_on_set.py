@@ -103,7 +103,7 @@ def main():
             crop = crop_image(img, rois[roi_name])
 
             t0 = time.perf_counter()
-            value = parser.parse(crop)
+            value = parser.parse(crop).value
             elapsed_ms = (time.perf_counter() - t0) * 1000.0
             latencies_ms[roi_name].append(elapsed_ms)
 

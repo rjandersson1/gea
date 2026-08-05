@@ -18,3 +18,6 @@ class AltitudeParser(BaseOCR):
     whitelist = '0123456789'
     outlier_threshold = 60000.0
     orientation = 'vertical'
+
+    pixels_per_unit = 0.615
+    label_spacing_units = 100.0

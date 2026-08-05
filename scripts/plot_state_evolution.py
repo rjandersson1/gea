@@ -45,7 +45,8 @@ PARSERS = {
 }
 
 CAPTURE_HZ = 2
-DATASET = 'test_flight_heading_360'  # default folder name, relative to data/screenshots/
+# DATASET = 'test_flight_heading_360'  # default folder name, relative to data/screenshots/
+DATASET = 'test_flight_10s'  # default folder name, relative to data/screenshots/
 
 
 def crop_image(img, roi: dict):
@@ -75,7 +76,7 @@ def main():
                 series[roi_name].append(np.nan)
                 continue
             crop = crop_image(img, rois[roi_name])
-            value = parser.parse(crop)
+            value = parser.parse(crop).value
             series[roi_name].append(value if value is not None else np.nan)
 
     n = len(frames)

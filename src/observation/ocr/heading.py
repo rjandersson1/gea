@@ -19,13 +19,13 @@ class HeadingParser(BaseOCR):
     outlier_threshold = 360.0
     orientation = 'horizontal'
 
+    pixels_per_unit = 2.450
+    label_spacing_units = 30.0
+
     CARDINAL_DEGREES = {'N': 0.0, 'E': 90.0, 'S': 180.0, 'W': 270.0}
     VALID_CODES = {'3', '6', '12', '15', '21', '24', '30', '33'}
 
-    def parse(self, img) -> float | None:
-        value = super().parse(img)
-        if value is None:
-            return None
+    def _postprocess_value(self, value: float) -> float:
         return value % 360.0
 
     def _token_to_value(self, token: str) -> float | None:

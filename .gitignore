@@ -12,3 +12,4 @@ data/screenshots/raw/
 .vscode/
 .idea/
 .DS_Store
+/data/screenshots

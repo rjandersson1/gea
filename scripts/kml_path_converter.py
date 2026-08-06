@@ -116,6 +116,45 @@ def extract_points(kml_path: str) -> tuple[list[Point], int]:
     raise ValueError("No usable coordinates found in the tour.")
 
 
+def correct_altitude_steps(
+    points: list[Point], threshold_m: float = 200.0
+) -> tuple[list[Point], list[tuple[int, float]]]:
+    """
+    Correct abrupt altitude step-discontinuities in a recorded path.
+
+    Google Earth's tour recorder occasionally logs a bad camera pose for
+    a single frame, producing a step in altitude that persists in
+    subsequent points rather than reverting on the next sample (i.e. not
+    a single-frame spike, but a level shift). This is treated as a
+    recording artifact: any altitude change between consecutive points
+    exceeding threshold_m is assumed spurious, and that offset is
+    subtracted from every following point to restore a continuous curve.
+
+    This is a heuristic correction, not a verified fix - it assumes any
+    large jump is an artifact rather than a real, brief, sharp altitude
+    change. Returns the corrected points and a log of (point_index,
+    offset_removed_m) for each correction applied, so the corrections
+    it made can be checked.
+
+    Longitude/latitude are left untouched.
+    """
+    corrected: list[Point] = [points[0]]
+    corrections: list[tuple[int, float]] = []
+    cumulative_offset = 0.0
+
+    for i in range(1, len(points)):
+        lon, lat, alt = points[i]
+        raw_delta = alt - points[i - 1][2]
+
+        if abs(raw_delta) > threshold_m:
+            cumulative_offset += raw_delta
+            corrections.append((i, raw_delta))
+
+        corrected.append((lon, lat, alt - cumulative_offset))
+
+    return corrected, corrections
+
+
 def build_path_kml(points: list[Point], doc_name: str) -> str:
     """Build a LineString path KML string from a list of points."""
     coords_str = " ".join(f"{lon},{lat},{alt}" for lon, lat, alt in points)
@@ -146,30 +185,48 @@ def build_path_kml(points: list[Point], doc_name: str) -> str:
 """
 
 
-def convert(input_path: str) -> tuple[str, int, int]:
+def convert(
+    input_path: str, fix_altitude_steps: bool = False, step_threshold_m: float = 200.0
+) -> tuple[str, int, int, list[tuple[int, float]]]:
     """
     Convert a recorded tour KML at input_path to a path KML.
 
-    Returns (output_path, point_count, skipped_lookat_count).
+    Returns (output_path, point_count, skipped_lookat_count, corrections).
+    corrections is empty unless fix_altitude_steps is True.
     """
     points, skipped = extract_points(input_path)
 
+    corrections: list[tuple[int, float]] = []
+    if fix_altitude_steps:
+        points, corrections = correct_altitude_steps(points, step_threshold_m)
+
     base, ext = os.path.splitext(input_path)
-    output_path = f"{base}_converted{ext or '.kml'}"
+    suffix = "_converted_altfix" if fix_altitude_steps else "_converted"
+    output_path = f"{base}{suffix}{ext or '.kml'}"
 
     kml_text = build_path_kml(points, os.path.basename(output_path))
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(kml_text)
 
-    return output_path, len(points), skipped
+    return output_path, len(points), skipped, corrections
 
 
 if __name__ == "__main__":
+    # Set to True to apply the altitude step-correction filter (see
+    # correct_altitude_steps docstring - a heuristic, not a verified fix).
+    FIX_ALTITUDE_STEPS = False
+
     selected_path = select_file()
-    result_path, n_points, n_skipped = convert(selected_path)
+    result_path, n_points, n_skipped, corrections = convert(
+        selected_path, fix_altitude_steps=FIX_ALTITUDE_STEPS
+    )
 
     print(f"Extracted {n_points} points.")
     if n_skipped:
         print(f"Skipped {n_skipped} intro LookAt points (used Camera positions instead).")
+    if corrections:
+        print(f"Corrected {len(corrections)} altitude step(s):")
+        for idx, delta in corrections:
+            print(f"  point {idx}: raw jump of {delta:+.1f} m removed")
     print(f"Saved: {result_path}")

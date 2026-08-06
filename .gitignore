@@ -11,5 +11,13 @@ data/logs/
 data/screenshots/raw/
 .vscode/
 .idea/
-.DS_Store
-/data/screenshots
+
+# --- DATA/SCREENSHOTS WHITELIST LOGIC ---
+# 1. Allow Git to look into the screenshots directory
+!/data/screenshots/
+
+# 2. Ignore everything inside screenshots by default
+/data/screenshots/*
+
+# 3. Whitelist your specific target folder
+!/data/screenshots/test_flight_roll_360/

@@ -61,7 +61,7 @@ FIELD_MAP = {
 CAPTURE_HZ = 2
 # DATASET = 'test_flight_heading_360'  # default folder name, relative to data/screenshots/
 # DATASET = 'test_flight_10s'
-DATASET = 'test_flight_roll-easy'
+DATASET = 'test_flight_roll_360'
 
 def crop_image(img, roi: dict):
     return img[roi['y1']:roi['y2'], roi['x1']:roi['x2']]

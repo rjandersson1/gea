@@ -35,10 +35,10 @@ from src.utils.timing import RateLimiter
 from scripts.calibrate_rois import find_window, screenshot_window
 
 
-CAPTURE_HZ = 10.0
+CAPTURE_HZ = 4.0
 CAPTURE_DURATION_S = 30.0
 PRE_CAPTURE_DELAY_S = 5.0
-FOLDER_NAME = 'test_flight_roll-easy'
+FOLDER_NAME = 'test_flight_roll_360'
 
 
 def _read_key() -> str:
